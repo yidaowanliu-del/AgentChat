@@ -51,6 +51,7 @@ cp .env.example .env
 | `CDP_PORT` | 可选 | 默认 9222。若被占用（见 §0.4）改为 9333 等空闲端口 |
 | `AGENTCHAT_STATE_DIR` | 可选 | 仅当 `~/.local/state` 不可写（如属主为 root 且用户不愿 sudo）时设置，如 `<仓库根>/.state/agentchat` |
 | `CHROME_PROFILE` | 可选 | 默认 `~/.chrome-debug-profile`，一般不动 |
+| `AGENTCHAT_IMAGE_DIR` | 可选 | 图片生成下载目录。默认 `process.cwd()`（在哪运行 skill 落哪）；建议设为 `ai-images/` 避免污染仓库根（该目录已在 .gitignore） |
 
 ## 3. 启动 Chrome daemon
 
