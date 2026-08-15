@@ -3,7 +3,7 @@
  * Moodle Course Scraper — Single-pass CDP extraction for LMS assignments.
  *
  * Designed to be invoked by Claude Code as a fast pre-step before feeding
- * assignment data into AgentChat-IndependentTasks for multi-AI answering.
+ * assignment data into agentchat-independenttasks for multi-AI answering.
  *
  * Usage:
  *   node moodle_scraper.js [--course-url=https://lms.sysu.edu.cn/course/view.php?id=...]

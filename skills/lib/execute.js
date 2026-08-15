@@ -1,9 +1,9 @@
 /**
- * Shared subprocess executor over AgentChat-OneWeb.
+ * Shared subprocess executor over agentchat-oneweb.
  *
  * Unifies the callProvider / executeWithFallback / cleanResponse triplet that
- * previously lived as drifting near-copies inside AgentChat-IndependentTasks and
- * AgentChat-WebSubAgent. Divergences that had already crept in:
+ * previously lived as drifting near-copies inside agentchat-independenttasks and
+ * agentchat-websubagent. Divergences that had already crept in:
  *   - exit code 2 mapped to "auth" (FSA) vs "no_provider" (Workflow) — unified
  *     to "auth", matching OneWeb's documented ERR_NO_PROVIDER semantics
  *     ("all providers auth-gated").
@@ -128,7 +128,7 @@ function cleanResponse(text, provider) {
 
 /**
  * @param {object} opts
- * @param {string}  opts.webextPath          absolute path to AgentChat-OneWeb/index.js
+ * @param {string}  opts.webextPath          absolute path to agentchat-oneweb/index.js
  * @param {string}  [opts.logPrefix]         stderr log prefix
  * @param {number}  [opts.minCallBudgetMs]   stop the chain when remaining budget drops below this
  * @param {number}  [opts.perCallCapMs]      per-attempt timeout ceiling

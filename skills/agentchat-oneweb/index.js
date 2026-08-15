@@ -14,7 +14,7 @@
  *   node index.js --doctor         # check CDP connectivity only
  *   node index.js --from=ChatGPT   # start from a specific provider
  *   node index.js --from=Claude --single "..."  # try ONLY Claude, no cascade
- *                                   # (used by AgentChat-IndependentTasks, which owns
+ *                                   # (used by agentchat-independenttasks, which owns
  *                                   # its own cross-provider fallback + locking)
  *   node index.js --no-download-images "..."  # skip image download post-processing
  *   node index.js --image-path=/path/to/img.png "prompt"  # upload image before prompt
@@ -39,7 +39,7 @@
 // Two install-time failure modes previously surfaced as a raw MODULE_NOT_FOUND
 // stack with no fix attached:
 //   1. playwright-core missing — user skipped `npm install` in the skill dir.
-//   2. ../lib missing — user copied ONLY AgentChat-OneWeb/ into
+//   2. ../lib missing — user copied ONLY agentchat-oneweb/ into
 //      ~/.claude/skills/ without the sibling skills/lib/ tree (all shared
 //      pipeline code lives there). Both now fail with the exact command.
 let chromium;
@@ -61,8 +61,8 @@ try {
 } catch (e) {
     process.stderr.write(
         '[fallback] FATAL: shared library ../lib not found.\n' +
-        '[fallback]   AgentChat-OneWeb requires the sibling skills/lib/ directory.\n' +
-        '[fallback]   fix: copy the WHOLE skills/ tree (AgentChat-OneWeb/ + lib/) so that\n' +
+        '[fallback]   agentchat-oneweb requires the sibling skills/lib/ directory.\n' +
+        '[fallback]   fix: copy the WHOLE skills/ tree (agentchat-oneweb/ + lib/) so that\n' +
         `[fallback]        ${path.resolve(__dirname, '..', 'lib')} exists.\n`);
     process.exit(4);
 }
@@ -153,7 +153,7 @@ class InvocationContext {
         // receipt line there would be embedded into the answer text.
         emitReceipt({
             skillDir: SKILL_DIR,
-            skill: 'AgentChat-OneWeb',
+            skill: 'agentchat-oneweb',
             runId: this.runId,
             fields: {
                 exit: code,
@@ -764,7 +764,7 @@ async function tryAllProviders(browser, prompt, ctx, options = {}) {
 
     // singleAttempt: bound the loop to exactly one provider (startIdx) instead of
     // cascading through the rest of PROVIDER_CHAIN on failure. Used by callers
-    // (e.g. AgentChat-IndependentTasks) that implement their own cross-provider
+    // (e.g. agentchat-independenttasks) that implement their own cross-provider
     // fallback with external locking — without this, a single spawned attempt at
     // provider X could silently succeed via provider Y further down the chain,
     // while the caller's lock is only held on X, breaking mutual exclusion between

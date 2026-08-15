@@ -103,7 +103,7 @@ test('P3b: callProvider passes --ephemeral-tab only when requested', async () =>
 // ─────────────────────────────────────────────────────────────────────────────
 
 test('P3c: OneWeb source wires --ephemeral-tab through parse → options → tab policy', () => {
-    const src = fs.readFileSync(path.join(ROOT, 'skills', 'AgentChat-OneWeb', 'index.js'), 'utf8');
+    const src = fs.readFileSync(path.join(ROOT, 'skills', 'agentchat-oneweb', 'index.js'), 'utf8');
     assert.ok(src.includes("a === '--ephemeral-tab'"), 'flag parse branch missing');
     assert.ok(/ephemeralTab \? null : findProviderPage/.test(src), 'tab-reuse bypass missing');
     assert.ok(/ephemeralTab && result\.page && !result\.page\.isClosed\(\)/.test(src), 'ephemeral close-on-exit missing');
@@ -245,14 +245,14 @@ test('P2: kimi adapter exposes deep-think-off, honors opt-out, survives dead pag
 // ─────────────────────────────────────────────────────────────────────────────
 
 test('P4: orchestrator prints DAG nodes with " | ", not a "→" chain', () => {
-    const src = fs.readFileSync(path.join(ROOT, 'skills/AgentChat-IndependentTasks/index.js'), 'utf8');
+    const src = fs.readFileSync(path.join(ROOT, 'skills/agentchat-independenttasks/index.js'), 'utf8');
     assert.ok(!src.includes('.join(" → ")'), '误导性 "→" 连接仍存在');
     assert.ok(/DAG nodes: .*join\(" \| "\)/.test(src), '" | " 分隔的节点行缺失');
 });
 
 test('P5: --plan with an unreadable file exits 64 without dispatching', () => {
     const r = spawnSync(process.execPath, [
-        path.join(ROOT, 'skills/AgentChat-IndependentTasks/index.js'),
+        path.join(ROOT, 'skills/agentchat-independenttasks/index.js'),
         '--plan=/nonexistent/v19_no_such_plan.json', '--timeout=60000',
     ], { encoding: 'utf8', timeout: 20_000 });
     assert.strictEqual(r.status, 64, `expected exit 64, got ${r.status}\nstderr: ${r.stderr}`);
@@ -273,7 +273,7 @@ test('P5: --plan file content is loaded as the prompt (via parse-fail path)', ()
     ] }));
     try {
         const r = spawnSync(process.execPath, [
-            path.join(ROOT, 'skills/AgentChat-IndependentTasks/index.js'),
+            path.join(ROOT, 'skills/agentchat-independenttasks/index.js'),
             '--plan', tmp, '--doctor',
         ], { encoding: 'utf8', timeout: 20_000 });
         assert.ok(/Plan loaded from/.test(r.stderr), `plan load log missing\nstderr: ${r.stderr}`);
@@ -353,7 +353,7 @@ test('v20: kimi — single module-level logger, no per-call require boilerplate'
 });
 
 test('v20: OneWeb — grantPermissions hoisted out of the provider loop', () => {
-    const src = fs.readFileSync(path.join(ROOT, 'skills', 'AgentChat-OneWeb', 'index.js'), 'utf8');
+    const src = fs.readFileSync(path.join(ROOT, 'skills', 'agentchat-oneweb', 'index.js'), 'utf8');
     const grants = (src.match(/grantPermissions/g) || []).length;
     assert.strictEqual(grants, 1, `grantPermissions appears ${grants}× (expected 1: inside ensureClipboardPermissions)`);
     assert.ok(src.includes('ensureClipboardPermissions'), 'once-per-context helper missing');
@@ -365,7 +365,7 @@ test('v20: orchestrator — argv prompt + --plan warns instead of silent discard
     fs.writeFileSync(tmp, '{"subtasks":[]}');
     try {
         const r = spawnSync(process.execPath, [
-            path.join(ROOT, 'skills', 'AgentChat-IndependentTasks', 'index.js'),
+            path.join(ROOT, 'skills', 'agentchat-independenttasks', 'index.js'),
             'some', 'stray', 'argv', 'prompt', '--plan', tmp, '--doctor',
         ], { encoding: 'utf8', timeout: 20_000 });
         assert.ok(/WARN: both --plan and an argv prompt/.test(r.stderr),
@@ -376,7 +376,7 @@ test('v20: orchestrator — argv prompt + --plan warns instead of silent discard
 });
 
 test('v20: orchestrator — dead ts() removed, exception output carries primary_intended', () => {
-    const src = fs.readFileSync(path.join(ROOT, 'skills', 'AgentChat-IndependentTasks', 'index.js'), 'utf8');
+    const src = fs.readFileSync(path.join(ROOT, 'skills', 'agentchat-independenttasks', 'index.js'), 'utf8');
     assert.ok(!/function ts\(\)/.test(src), 'dead ts() still present');
     assert.ok(/primary_intended: primaryKey, response: null, error: String\(e\)/.test(src),
         'exception branch missing primary_intended');

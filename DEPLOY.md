@@ -1,7 +1,7 @@
 # AgentChat 部署指南（供 Agent 阅读执行）
 
 > 本文档面向 AI Agent（Claude Code 等）。目标：在一台新机器上从零部署 AgentChat，
-> 使 `/AgentChat-OneWeb` 等 skill 可用。请按顺序执行，遇到决策点按「环境判断」选择。
+> 使 `/agentchat-oneweb` 等 skill 可用。请按顺序执行，遇到决策点按「环境判断」选择。
 
 ---
 
@@ -22,15 +22,14 @@
 ```bash
 git clone https://github.com/yidaowanliu-del/AgentChat.git && cd AgentChat
 npm install
-(cd skills/AgentChat-OneWeb && npm install)
+(cd skills/agentchat-oneweb && npm install)
 ```
 
 Python 依赖装进项目 venv（避免污染系统 Python；daemon 脚本要求 Python ≥ 3.10 语法）：
 
 ```bash
-uv venv .venv --python 3.13          # 或任何 ≥3.10；无 uv 时: python3.13 -m venv .venv
-uv pip install --python .venv/bin/python playwright websocket-client
-# 无 uv 的等价写法: .venv/bin/pip install playwright websocket-client
+uv sync                             # 按 uv.lock 精确复现（Python ≥3.10 自动解析）
+# 无 uv 时: python3 -m venv .venv && .venv/bin/pip install playwright websocket-client
 ```
 
 > 校验：`.venv/bin/python -c "import playwright, websocket; print('ok')"`
@@ -98,7 +97,7 @@ Agent 无法代替用户登录，请提示用户在弹出的窗口中按需登�
 ## 5. 验证端到端链路
 
 ```bash
-node skills/AgentChat-OneWeb/index.js "请用一句话介绍你自己"
+node skills/agentchat-oneweb/index.js "请用一句话介绍你自己"
 ```
 
 成功标志：输出含 `✓ <Provider>: USED` 和 `[receipt] AGENTCHAT_RUN`。
@@ -107,18 +106,18 @@ node skills/AgentChat-OneWeb/index.js "请用一句话介绍你自己"
 单 provider 诊断：
 
 ```bash
-node skills/AgentChat-OneWeb/index.js --provider gemini "什么是二叉树？一句话"
+node skills/agentchat-oneweb/index.js --provider gemini "什么是二叉树？一句话"
 ```
 
 ## 6. Claude Code skill 接入
 
 ```bash
-ln -s "$(pwd)/skills/AgentChat-OneWeb" ~/.claude/skills/AgentChat-OneWeb
-ln -s "$(pwd)/skills/AgentChat-IndependentTasks" ~/.claude/skills/AgentChat-IndependentTasks
-ln -s "$(pwd)/skills/AgentChat-WebSubAgent" ~/.claude/skills/AgentChat-WebSubAgent
+ln -s "$(pwd)/skills/agentchat-oneweb" ~/.claude/skills/agentchat-oneweb
+ln -s "$(pwd)/skills/agentchat-independenttasks" ~/.claude/skills/agentchat-independenttasks
+ln -s "$(pwd)/skills/agentchat-websubagent" ~/.claude/skills/agentchat-websubagent
 ```
 
-链接后重启 Claude Code 会话即可通过 `/AgentChat-OneWeb` 等调用。
+链接后重启 Claude Code 会话即可通过 `/agentchat-oneweb` 等调用。
 
 ---
 

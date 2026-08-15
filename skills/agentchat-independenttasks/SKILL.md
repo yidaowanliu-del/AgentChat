@@ -1,9 +1,9 @@
 ---
-name: AgentChat-IndependentTasks
+name: agentchat-independenttasks
 description: 并行分发 N 道独立任务给多个浏览器 AI，回收后由 Claude Code 合成权威答案并输出教科书式解答手册 PDF。触发词："分给多个 AI""并行问多个 AI""汇总成 PDF/解答手册"。不适用于需 AI 间协作或角色分工的任务。
 ---
 
-# AgentChat-IndependentTasks：独立任务并行分发 + 解答手册合成
+# agentchat-independenttasks：独立任务并行分发 + 解答手册合成
 
 ## ⛔ 角色边界
 
@@ -24,12 +24,12 @@ N 道独立任务，M 个能力等同的 AI（最多 7：gemini/chatgpt/qwen/kim
 
 ## 强制执行规则（不可跳过、不可绕过）
 
-1. **必须真实派发。** 一切 AI 查询必须通过 `node ~/.claude/skills/AgentChat-IndependentTasks/index.js` 实际执行，禁止 Claude Code 自行代答。
+1. **必须真实派发。** 一切 AI 查询必须通过 `node ~/.claude/skills/agentchat-independenttasks/index.js` 实际执行，禁止 Claude Code 自行代答。
 
 2. **必须生成运行回执（receipt）。** 由 `skills/lib/receipt.js` 生成，回执缺失 = 未执行。
 
 3. **文件修改分级:**
-   - **冻结（只读）**: `index.js`（编排层）、`AgentChat-OneWeb/index.js`（Provider 层）
+   - **冻结（只读）**: `index.js`（编排层）、`agentchat-oneweb/index.js`（Provider 层）
    - **共享库（改动需跨技能验证 + 全量测试）**: `lib/*.js`（含 `lib/plan.js`、`lib/execute.js`、`lib/locks.js` 等）
    - **可自由修改**: `SKILL.md`、`synthesize.js`、`validate_answers.js`、`md2pdf.sh`
 
@@ -66,7 +66,7 @@ N 道独立任务，M 个能力等同的 AI（最多 7：gemini/chatgpt/qwen/kim
 ## Step 0：网页内容爬取（仅当题目来源为浏览器页面时）
 
 ```bash
-node ~/.claude/skills/AgentChat-OneWeb/moodle_scraper.js --detail-timeout=15000 --max-detail=15
+node ~/.claude/skills/agentchat-oneweb/moodle_scraper.js --detail-timeout=15000 --max-detail=15
 ```
 
 ### Step 0a：检查附件
@@ -212,10 +212,10 @@ Step 2:   lint + dispatch（0 Claude Code tokens）
 **派发**（v25 优化，省 ~5K token）：
 ```bash
 # lint
-node ~/.claude/skills/AgentChat-IndependentTasks/validate_answers.js --lint /tmp/agentchat_plan.json
+node ~/.claude/skills/agentchat-independenttasks/validate_answers.js --lint /tmp/agentchat_plan.json
 
 # dispatch（--summary-only: 终端只输出一行 JSON；--raw-out: 完整原始输出写文件）
-node ~/.claude/skills/AgentChat-IndependentTasks/index.js \
+node ~/.claude/skills/agentchat-independenttasks/index.js \
   --plan=/tmp/agentchat_plan.json \
   --summary-only --raw-out=/tmp/agentchat_raw.txt
 ```
@@ -226,7 +226,7 @@ node ~/.claude/skills/AgentChat-IndependentTasks/index.js \
 
 ```bash
 OUTDIR="/tmp/agentchat_answers_$(date +%H%M%S)"
-node ~/.claude/skills/AgentChat-IndependentTasks/validate_answers.js \
+node ~/.claude/skills/agentchat-independenttasks/validate_answers.js \
   /tmp/agentchat_plan.json /tmp/agentchat_raw.txt --out="$OUTDIR"
 ```
 
@@ -239,7 +239,7 @@ node ~/.claude/skills/AgentChat-IndependentTasks/validate_answers.js \
 **推荐方式**（省 ~10K token）：用 `synthesize.js` 自动生成 → Claude Code 只做最终审校。
 
 ```bash
-node ~/.claude/skills/AgentChat-IndependentTasks/synthesize.js \
+node ~/.claude/skills/agentchat-independenttasks/synthesize.js \
   --clean="$OUTDIR/clean" \
   --meta=/tmp/tasks_extracted.json \
   --out=/tmp/solutions.md
@@ -253,7 +253,7 @@ node ~/.claude/skills/AgentChat-IndependentTasks/synthesize.js \
 
 ```bash
 export AGENTCHAT_VALIDATED_DIR=/tmp/agentchat_answers_XXXXXX
-bash ~/.claude/skills/AgentChat-IndependentTasks/md2pdf.sh /tmp/solutions.md output.pdf
+bash ~/.claude/skills/agentchat-independenttasks/md2pdf.sh /tmp/solutions.md output.pdf
 ```
 
 Markdown：YAML 封面 → `#outline()` → `## Problem N: 标题` → `**Question:**` → `**Solution:**`（LaTeX `$$...$$`）→ `**Key Result:**`（`> ` 引用块）。

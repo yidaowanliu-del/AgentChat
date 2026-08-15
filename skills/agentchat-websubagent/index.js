@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * AgentChat-WebSubAgent — Sequential Pipeline Helper
+ * agentchat-websubagent — Sequential Pipeline Helper
  *
- * Thin wrapper over AgentChat-OneWeb. Claude Code is the master controller;
+ * Thin wrapper over agentchat-oneweb. Claude Code is the master controller;
  * this script ONLY handles external AI calls for steps 2 (search), 3 (reason), 5 (review).
  *
  * Usage:
@@ -21,7 +21,7 @@ const fs = require("fs");
 // GUARD: ../lib is a sibling tree shared by all AgentChat skills.
 // Copying ONLY this skill directory to ~/.claude/skills/ loses it —
 // every ../lib require would throw a bare MODULE_NOT_FOUND stack.
-// Mirror of the v14 guard in AgentChat-OneWeb/index.js.
+// Mirror of the v14 guard in agentchat-oneweb/index.js.
 // ═══════════════════════════════════════════════════════════════════
 let acquireLock, releaseLock, cleanupAllLocks, makeRunId, emitReceipt;
 try {
@@ -46,7 +46,7 @@ process.on("SIGTERM", () => { cleanupAllLocks(); process.exit(143); });
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════
 
-const WEBEXT = path.resolve(__dirname, "..", "AgentChat-OneWeb", "index.js");
+const WEBEXT = path.resolve(__dirname, "..", "agentchat-oneweb", "index.js");
 const { PROVIDER_CHAIN } = require("../lib/providers/chain");
 const ALL_KEYS = PROVIDER_CHAIN.map(p => p.key);
 
@@ -174,7 +174,7 @@ async function main() {
     // persisted to data/receipts.jsonl for user-side verification.
     const receipt = emitReceipt({
         skillDir: __dirname,
-        skill: "AgentChat-WebSubAgent",
+        skill: "agentchat-websubagent",
         runId: makeRunId(),
         fields: {
             mode: mode || "custom",

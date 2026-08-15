@@ -21,9 +21,9 @@
 
 | Skill | 类型 | 职责 | 何时用 |
 |-------|------|------|--------|
-| **AgentChat-OneWeb** | 串行降级链 | 1个ai，7个替补。只使用一个你最喜欢的ai，免费额度耗尽自动切换，8-Provider 自动 fallback |代码 + 多模态 |
-| **AgentChat-IndependentTasks** | 并行编排 | 一次性触发8个ai。默认触发4个，可根据任务数量指定，如16个独立任务让8个Web 端分别执行两个任务 |大量高独立性任务|
-| **AgentChat-WebSubAgent** | 串行管道 | 核心Skill（架构图如下），6 步 AI 管道：你的Agent规划→Kimi 搜索→Gemini 推理→Agent 合成→ChatGPT或Claude 审查 | 深度推理 + 质量审查 |
+| **agentchat-oneweb** | 串行降级链 | 1个ai，7个替补。只使用一个你最喜欢的ai，免费额度耗尽自动切换，8-Provider 自动 fallback |代码 + 多模态 |
+| **agentchat-independenttasks** | 并行编排 | 一次性触发8个ai。默认触发4个，可根据任务数量指定，如16个独立任务让8个Web 端分别执行两个任务 |大量高独立性任务|
+| **agentchat-websubagent** | 串行管道 | 核心Skill（架构图如下），6 步 AI 管道：你的Agent规划→Kimi 搜索→Gemini 推理→Agent 合成→ChatGPT或Claude 审查 | 深度推理 + 质量审查 |
 
 ---
 
@@ -43,7 +43,7 @@ pip3 install playwright websocket-client
 
 # Node.js 依赖（AI bridge — 根目录统一管理 + OneWeb skill）
 npm install
-(cd skills/AgentChat-OneWeb && npm install)
+(cd skills/agentchat-oneweb && npm install)
 ```
 
 ### 2. 配置 & 启动
@@ -58,13 +58,13 @@ bash scripts/start-chrome-debug.sh  # 启动 Chrome daemon
 
 ```bash
 # 单 prompt 高可用 — 自动 fallback
-/AgentChat-OneWeb 帮我写Python脚本/根据文字生成视频
+/agentchat-oneweb 帮我写Python脚本/根据文字生成视频
 
 # 8 路并发 — 大量高独立性任务
-/AgentChat-IndependentTasks 高独立性的多个任务：根据我的任务调用8个ai生成8个脚本/8个视频
+/agentchat-independenttasks 高独立性的多个任务：根据我的任务调用8个ai生成8个脚本/8个视频
 
 # 串行深度管道 — 规划→搜索→推理→合成→审查→修复
-/AgentChat-WebSubAgent 帮我设计一个高并发消息队列的架构方案
+/agentchat-websubagent 帮我设计一个高并发消息队列的架构方案
 ```
 
 ## 🧠 Claude Code Integration
@@ -84,10 +84,10 @@ bash scripts/start-chrome-debug.sh  # 启动 Chrome daemon
 ### 环境诊断
 
 ```bash
-node skills/AgentChat-OneWeb/index.js --smoke     # 遍历 8 个 provider
-node skills/AgentChat-OneWeb/index.js --doctor    # CDP 端口连通性检查
-node skills/AgentChat-IndependentTasks/index.js --smoke    # 并行编排环境检查
-node skills/AgentChat-WebSubAgent/index.js --doctor    # 串行管道环境检查
+node skills/agentchat-oneweb/index.js --smoke     # 遍历 8 个 provider
+node skills/agentchat-oneweb/index.js --doctor    # CDP 端口连通性检查
+node skills/agentchat-independenttasks/index.js --smoke    # 并行编排环境检查
+node skills/agentchat-websubagent/index.js --doctor    # 串行管道环境检查
 ```
 
 ---
@@ -130,16 +130,16 @@ AgentChat/
     │           ├── minimax.js             #     TipTap 异步挂载
     │           ├── mimo.js                #     DOM 遍历 send button
     │           └── deepseek.js            #     标准管线
-    ├── AgentChat-OneWeb/           # 8-Provider Fallback Chain
+    ├── agentchat-oneweb/           # 8-Provider Fallback Chain
     │   ├── SKILL.md                     # 🤖 AI 操作指南
     │   ├── index.js                     # 编排入口（~530 行，零 provider 代码）
     │   ├── CHANGELOG.md                 # 变更日志
     │   ├── package.json
     │   └── data/                        # 遥测数据
-    ├── AgentChat-IndependentTasks/          # 并行编排器（DAG + 波次调度 + 证据仲裁）
+    ├── agentchat-independenttasks/          # 并行编排器（DAG + 波次调度 + 证据仲裁）
     │   ├── SKILL.md                     # 🤖 AI 操作指南 + 角色分工
     │   └── index.js                     # 薄编排器（~710 行，零 provider 代码）
-    └── AgentChat-WebSubAgent/           # 串行 6 步管道
+    └── agentchat-websubagent/           # 串行 6 步管道
         ├── SKILL.md                     # 🤖 AI 操作指南
         └── index.js                     # 管道 helper（~160 行，零 provider 代码）
 ```
@@ -201,7 +201,7 @@ GFW 会阻断 Chrome 启动时向 Google 云端发起的 SSL 请求，导致 Chr
 pkill -9 chrome && bash scripts/start-chrome-debug.sh
 ```
 
-详见 `skills/AgentChat-OneWeb/SKILL.md` → 各 Provider 实现说明。
+详见 `skills/agentchat-oneweb/SKILL.md` → 各 Provider 实现说明。
 </details>
 
 <details>

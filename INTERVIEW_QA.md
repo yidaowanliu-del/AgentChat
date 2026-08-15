@@ -936,7 +936,7 @@ FreeSubAgent 的 4 角色做的是不同维度——可以并行。Workflow 的�
 | 我们的代码 | git subprocess 直接传 prompt | 作者重写为 `asRe()` + `--ephemeral-tab` + `--single` | 全面强化 |
 
 **作者做了哪些增强**：
-- **重命名**：`AgentChat-WebExtended` → `AgentChat-OneWeb`，`AgentChat-FreeSubAgent` → `AgentChat-WebSubAgent`
+- **重命名**：`AgentChat-WebExtended` → `agentchat-oneweb`，`AgentChat-FreeSubAgent` → `agentchat-websubagent`
 - **类型安全**：我们的 `reParts()` 辅助函数被替换为作者自己实现的 `asRe()` 统一处理字符串/RegExp 双态
 - **并发模型**：新增 `--ephemeral-tab`（独立 tab，不复用）、`--single`（单 Provider 不级联）、同 Provider 多 tab 并发
 - **可靠性**：v10-v24 累计 30+ bugfix：auth 硬化、UI 适配、CDP 自救、超时预算、锁竞争、响应验证门
@@ -1404,7 +1404,7 @@ AgentChat 的功能很强，但展示方式只有 CLI 输出。面试时不可�
               ├── 端口自动清理: EADDRINUSE → netstat 找 PID → kill → 重试
               └── 10 个 API 端点 ↓
                          │
-              child_process.spawn('node', ['AgentChat-OneWeb/index.js', ...])
+              child_process.spawn('node', ['agentchat-oneweb/index.js', ...])
                          │
                          ▼
               Chrome CDP → 8 AI Providers
@@ -1506,8 +1506,8 @@ Cold start 友好。用户不需要手动 `start-chrome-debug.sh`，demo_server 
 
 | 旧名（我们的） | 新名（上游） |
 |--------------|------------|
-| `AgentChat-WebExtended` | **AgentChat-OneWeb** |
-| `AgentChat-FreeSubAgent` | **AgentChat-WebSubAgent** |
+| `AgentChat-WebExtended` | **agentchat-oneweb** |
+| `AgentChat-FreeSubAgent` | **agentchat-websubagent** |
 
 重命名的逻辑：`OneWeb` = 一个 Web 端 → 多 Provider 桥接（单入口），`WebSubAgent` = Web 端的子 Agent 编排器。品牌定位更清晰。
 

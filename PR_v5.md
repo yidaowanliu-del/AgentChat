@@ -47,14 +47,14 @@ node scripts/demo_server.js
 | 方法 | 路径 | 功能 | 调用的 Skill |
 |------|------|------|------------|
 | `GET` | `/api/health` | CDP 连接状态 | — |
-| `GET` | `/api/smoke` | 8 Provider 可达性检查 | `AgentChat-OneWeb --smoke` |
+| `GET` | `/api/smoke` | 8 Provider 可达性检查 | `agentchat-oneweb --smoke` |
 | `GET` | `/api/stats` | 服务器运行统计 | — |
-| `POST` | `/api/ask` | 单 Provider 问答 | `AgentChat-OneWeb --from=X` |
-| `POST` | `/api/parallel` | 4 Worker 并行编排 | `AgentChat-OneWeb` ×4 |
-| `POST` | `/api/search-web` | Kimi 联网搜索 | `AgentChat-OneWeb --from=kimi` |
-| `POST` | `/api/deep-reason` | Gemini 深度推理 | `AgentChat-OneWeb --from=gemini` |
-| `POST` | `/api/review` | ChatGPT 交叉审查 | `AgentChat-OneWeb --from=chatgpt` |
-| `POST` | `/api/verify` | Qwen 事实核查 | `AgentChat-OneWeb --from=qwen` |
+| `POST` | `/api/ask` | 单 Provider 问答 | `agentchat-oneweb --from=X` |
+| `POST` | `/api/parallel` | 4 Worker 并行编排 | `agentchat-oneweb` ×4 |
+| `POST` | `/api/search-web` | Kimi 联网搜索 | `agentchat-oneweb --from=kimi` |
+| `POST` | `/api/deep-reason` | Gemini 深度推理 | `agentchat-oneweb --from=gemini` |
+| `POST` | `/api/review` | ChatGPT 交叉审查 | `agentchat-oneweb --from=chatgpt` |
+| `POST` | `/api/verify` | Qwen 事实核查 | `agentchat-oneweb --from=qwen` |
 
 ### 9 个前端页面
 
@@ -75,7 +75,7 @@ node scripts/demo_server.js
 
 **2. CDP 自动启动** — 检测 CDP 不在线 → `spawn('chrome.exe', ...)` → 轮询 `/json/version` → 就绪。用户不需要手动启动 Chrome。
 
-**3. prompt 通过 CLI 参数传递** — 不通过 stdin。原因是 MINGW64 bash 环境下 `child.stdin.write(中文)` 会出现 UTF-8 → GBK 编码破坏。`args.push(prompt)` → AgentChat-OneWeb 通过 `remaining.join(' ')` 读取，不受终端编码影响。
+**3. prompt 通过 CLI 参数传递** — 不通过 stdin。原因是 MINGW64 bash 环境下 `child.stdin.write(中文)` 会出现 UTF-8 → GBK 编码破坏。`args.push(prompt)` → agentchat-oneweb 通过 `remaining.join(' ')` 读取，不受终端编码影响。
 
 **4. smoke 后清理 AI 网站 tab** — `callSmoke()` 打开 8 个 Provider tab 查可达性。如果没有清理，后续 `/api/ask` 检测到 `tab_already_open` 会跳过全部 Provider。每次请求前通过 CDP `/json/close/{id}` 关闭残留 AI tab，但保留 `about:blank`（Chrome 需要一个暖 tab 防止进程退出）。
 

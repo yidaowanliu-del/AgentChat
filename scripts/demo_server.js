@@ -22,7 +22,7 @@ const { getContext, addTurn, generateSummary, clearSession, getSessionData } = r
 
 const PORT = 3456;
 const PROJECT_DIR = path.resolve(__dirname, '..');
-const WEBEXT_INDEX = path.join(PROJECT_DIR, 'skills', 'AgentChat-OneWeb', 'index.js');
+const WEBEXT_INDEX = path.join(PROJECT_DIR, 'skills', 'agentchat-oneweb', 'index.js');
 const DEMO_HTML = path.join(PROJECT_DIR, 'demo', 'index.html');
 // 用已知的 Node.js 路径（Windows 上 PATH 不包含 node 时也能跑）
 const NODE_EXE = process.platform === 'win32'

@@ -156,7 +156,7 @@ function fakePage(html) {
         'all three editor tiers are tagged for telemetry');
     ok(pf.includes('editor_tier'), 'editor tier lands in ctx.telemetry');
 
-    const ow = fs.readFileSync(path.join(AGENTCHAT_ROOT, 'skills/AgentChat-OneWeb/index.js'), 'utf8');
+    const ow = fs.readFileSync(path.join(AGENTCHAT_ROOT, 'skills/agentchat-oneweb/index.js'), 'utf8');
     ok(ow.includes('acquireBrowserSlot(') && ow.includes('releaseBrowserSlot(browserSlot)'),
         'OneWeb acquires and releases an admission slot around the chain');
     ok(/finally\s*\{\s*releaseBrowserSlot\(browserSlot\);/.test(ow),

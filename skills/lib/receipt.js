@@ -23,13 +23,13 @@
  * answer.
  *
  * Stream policy (IMPORTANT — do not change casually):
- *   - AgentChat-OneWeb's stdout is a MACHINE CONTRACT: parents
+ *   - agentchat-oneweb's stdout is a MACHINE CONTRACT: parents
  *     (lib/execute.js, the Python SDK, the MCP server) take stdout verbatim
  *     as the AI response. Its receipt therefore goes to STDERR, alongside the
  *     existing "✓ X: USED" marker.
- *   - AgentChat-IndependentTasks's stdout is a human/agent-readable report — the
+ *   - agentchat-independenttasks's stdout is a human/agent-readable report — the
  *     receipt is appended to STDOUT so it survives in the captured output.
- *   - AgentChat-WebSubAgent prints a single JSON object on stdout — the
+ *   - agentchat-websubagent prints a single JSON object on stdout — the
  *     receipt is embedded as a `receipt` field inside that JSON (plus a
  *     stderr copy for uniform grepping).
  */
@@ -40,7 +40,7 @@ const { appendWithRotation } = require('./telemetry');
 
 // run_id = 'ac-' + <8 hex: seconds-since-epoch, time-ordered> + <16 hex: 8
 // random bytes>. The random half went from 6→8 bytes (48→64 bits) because
-// AgentChat-IndependentTasks fans out to M concurrent worker processes that
+// agentchat-independenttasks fans out to M concurrent worker processes that
 // each emit a receipt into the SAME receipts.jsonl; at 48 bits a birthday
 // collision becomes non-negligible across a busy audit trail, and two runs
 // sharing a run_id would break the `grep <run_id>` verification contract. The

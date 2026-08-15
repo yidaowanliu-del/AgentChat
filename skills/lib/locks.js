@@ -1,7 +1,7 @@
 /**
  * Shared file locking — atomic mkdir-based mutex for provider mutual exclusion.
  *
- * Used by AgentChat-IndependentTasks and AgentChat-WebSubAgent.
+ * Used by agentchat-independenttasks and agentchat-websubagent.
  * Locks live in /tmp/ai_locks/<provider>/ — one directory per provider.
  * Only the process that successfully creates the directory holds the lock.
  * Stale-lock cleanup uses atomic renameSync to avoid TOCTOU races.

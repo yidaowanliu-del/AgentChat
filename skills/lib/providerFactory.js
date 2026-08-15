@@ -1882,7 +1882,7 @@ function createProviderRunner(cfg) {
         if (editor._fsTier && editor._fsTier !== 'css') {
             try {
                 appendWithRotation(
-                    path.join(__dirname, '..', 'AgentChat-OneWeb', 'data', 'selector_drift.jsonl'),
+                    path.join(__dirname, '..', 'agentchat-oneweb', 'data', 'selector_drift.jsonl'),
                     JSON.stringify({
                         ts: new Date().toISOString(), provider: C.key, role: 'editor',
                         tier: editor._fsTier, dead_selectors: C.editorSelectors,

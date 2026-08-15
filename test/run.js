@@ -45,7 +45,7 @@ const suites = fs
 // clear notice) instead of failing — the suite's assertions never ran, which is
 // not the same as a regression. jsdom is a devDependency; playwright-core is a
 // runtime dependency pulled in transitively by suites that require
-// AgentChat-OneWeb/index.js.
+// agentchat-oneweb/index.js.
 const OPTIONAL_DEPS = ['jsdom', 'playwright-core'];
 
 function missingDepsFor(file) {
@@ -56,10 +56,10 @@ function missingDepsFor(file) {
         return [];
     }
     return OPTIONAL_DEPS.filter((dep) => {
-        // Suite pulls the dep in directly, or indirectly via AgentChat-OneWeb.
+        // Suite pulls the dep in directly, or indirectly via agentchat-oneweb.
         const referenced =
             new RegExp(`require\\(['"]${dep}['"]\\)`).test(src) ||
-            /AgentChat-OneWeb\/index\.js/.test(src);
+            /agentchat-oneweb\/index\.js/.test(src);
         if (!referenced) return false;
         try {
             require.resolve(dep, { paths: [ROOT] });

@@ -1,6 +1,6 @@
 ---
-name: AgentChat-OneWeb
-description: Multi-provider CDP bridge with automatic fallback (Gemini->ChatGPT->Claude->Qwen->Kimi->MiniMax->Doubao->MiMo->DeepSeek). Use for AI provider failover, fallback chain, multi-provider routing, or "send to any available AI". MANDATORY EXECUTION - invoking this skill REQUIRES running `node ~/.claude/skills/AgentChat-OneWeb/index.js "<prompt>"` as the FIRST action and quoting its `[receipt] AGENTCHAT_RUN` line in the final answer; explaining the skill or answering from model knowledge without a receipt is a violation.
+name: agentchat-oneweb
+description: Multi-provider CDP bridge with automatic fallback (Gemini->ChatGPT->Claude->Qwen->Kimi->MiniMax->Doubao->MiMo->DeepSeek). Use for AI provider failover, fallback chain, multi-provider routing, or "send to any available AI". MANDATORY EXECUTION - invoking this skill REQUIRES running `node ~/.claude/skills/agentchat-oneweb/index.js "<prompt>"` as the FIRST action and quoting its `[receipt] AGENTCHAT_RUN` line in the final answer; explaining the skill or answering from model knowledge without a receipt is a violation.
 ---
 
 # AI Fallback Chain — Multi-Provider CDP Bridge
@@ -11,13 +11,13 @@ description: Multi-provider CDP bridge with automatic fallback (Gemini->ChatGPT-
 
 ## ⚠️ 强制规则 — 调用即执行（首要动作契约）
 
-**本 skill 被调用（如 `/AgentChat-OneWeb <问题>`）时，必须执行 `node` 命令把用户问题发送到 web AI。禁止只解释用法而不执行，禁止用模型自身知识替代 web AI 的回答。**
+**本 skill 被调用（如 `/agentchat-oneweb <问题>`）时，必须执行 `node` 命令把用户问题发送到 web AI。禁止只解释用法而不执行，禁止用模型自身知识替代 web AI 的回答。**
 
 ### 1. 首要动作契约
 读完本 SKILL.md 之后的**下一个工具调用**必须是：
 
 ```bash
-node ~/.claude/skills/AgentChat-OneWeb/index.js "<用户prompt>"
+node ~/.claude/skills/agentchat-oneweb/index.js "<用户prompt>"
 ```
 
 中间不允许插入文件浏览、架构分析、"我将会…"式的规划叙述（至多一行说明即将执行的命令）。web AI 返回结果后，才可补充你自己的分析。
@@ -26,12 +26,12 @@ node ~/.claude/skills/AgentChat-OneWeb/index.js "<用户prompt>"
 每次真实执行（含失败）都会在 **stderr** 输出一行机器生成的回执：
 
 ```
-[receipt] AGENTCHAT_RUN {"run_id":"ac-xxxxxxxxxxxx","skill":"AgentChat-OneWeb","exit":0,"provider_used":"Gemini",...}
+[receipt] AGENTCHAT_RUN {"run_id":"ac-xxxxxxxxxxxx","skill":"agentchat-oneweb","exit":0,"provider_used":"Gemini",...}
 ```
 
 - **最终回答末尾必须原样引用这行 receipt**（至少包含 run_id、provider_used、exit）。
 - 没有 receipt = 没有执行 = 违规，必须回去执行。
-- `run_id` 为随机生成并同步落盘到 `~/.claude/skills/AgentChat-OneWeb/data/receipts.jsonl`，用户可用 `grep <run_id>` 核对——凭空编造无法通过核对。
+- `run_id` 为随机生成并同步落盘到 `~/.claude/skills/agentchat-oneweb/data/receipts.jsonl`，用户可用 `grep <run_id>` 核对——凭空编造无法通过核对。
 - **执行失败（exit≠0）同样有 receipt**：必须引用失败回执并说明原因（限流/未登录/超时…），在此之后才允许用模型自身能力回答，且必须明确标注"web AI 未参与本次回答"。
 
 ### 3. 违规模式（全部禁止）
@@ -75,7 +75,7 @@ node ~/.claude/skills/AgentChat-OneWeb/index.js "<用户prompt>"
 检测到图片生成请求时，**必须**在命令中加入 `--image` flag：
 
 ```bash
-node ~/.claude/skills/AgentChat-OneWeb/index.js --image "<用户原始prompt>"
+node ~/.claude/skills/agentchat-oneweb/index.js --image "<用户原始prompt>"
 ```
 
 index.js 会在进程内把标准增强指令（"请使用你的图片生成模型/工具主动生成…"）追加到 prompt 末尾，并在 telemetry 中记录 `image_prompt_enhanced: true`。**禁止手工改写 prompt 来替代 `--image`** —— 手工追加是纯 prose 约束，属于 receipt 机制要消灭的那类"叙述性合规"；flag 路径是机器可验证的（telemetry 可查）。
@@ -106,7 +106,7 @@ index.js 在收到 web AI 响应后，**自动执行**以下步骤：
 ### 3. 下载目录说明
 
 下载目标始终为 **用户当前工作目录**（shell 的 `$PWD`），而非 skill 安装目录。例如：
-* 用户在 `~/Project/` 下调用 `/AgentChat-OneWeb 帮我画流程图` → 图片下载到 `~/Project/`
+* 用户在 `~/Project/` 下调用 `/agentchat-oneweb 帮我画流程图` → 图片下载到 `~/Project/`
 * 用户在 `~/Data_Project/` 下调用 → 图片下载到 `~/Data_Project/`
 
 可通过 `--no-download-images` 标志禁用自动下载。
@@ -128,7 +128,7 @@ index.js 在收到 web AI 响应后，**自动执行**以下步骤：
 当用户说"把图片上传给AI"或类似指令时，**必须**从用户消息中提取图片文件路径，然后使用 `--image-path` 标志：
 
 ```bash
-node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path="<图片绝对路径>" "<用户prompt>"
+node ~/.claude/skills/agentchat-oneweb/index.js --image-path="<图片绝对路径>" "<用户prompt>"
 ```
 
 **路径解析规则**：
@@ -171,16 +171,16 @@ node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path="<图片绝对路�
 
 ```bash
 # 单张图片
-node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path=./screenshot.png "分析这张截图的内容"
+node ~/.claude/skills/agentchat-oneweb/index.js --image-path=./screenshot.png "分析这张截图的内容"
 
 # 多张图片
-node ~/.claude/skills/AgentChat-OneWeb/index.js \
+node ~/.claude/skills/agentchat-oneweb/index.js \
   --image-path=./before.png \
   --image-path=./after.png \
   "比较这两张图片的差异"
 
 # 指定 provider 上传
-node ~/.claude/skills/AgentChat-OneWeb/index.js \
+node ~/.claude/skills/agentchat-oneweb/index.js \
   --image-path=./photo.jpg \
   --from=Gemini \
   "描述这张照片"
@@ -193,7 +193,7 @@ node ~/.claude/skills/AgentChat-OneWeb/index.js \
 1. **识别图片路径**：从用户消息中提取图片文件路径
 2. **验证文件存在**：确认图片文件存在于用户系统中
 3. **构造命令**：使用 `--image-path=<绝对路径>` 标志
-4. **执行命令**：运行 `node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path=... "prompt"`
+4. **执行命令**：运行 `node ~/.claude/skills/agentchat-oneweb/index.js --image-path=... "prompt"`
 5. **引用 receipt**：按强制规则 §2 在最终回答中引用 `[receipt] AGENTCHAT_RUN` 行
 
 **禁止行为**：
@@ -301,10 +301,10 @@ pgrep -f "start-chrome-debug" || bash scripts/start-chrome-debug.sh
 curl -s http://127.0.0.1:9222/json/version | python3 -c "import json,sys; print(json.load(sys.stdin).get('Browser','FAIL'))"
 
 # 3. playwright-core (npm, ~3MB)
-(cd ~/.claude/skills/AgentChat-OneWeb && npm install)
+(cd ~/.claude/skills/agentchat-oneweb && npm install)
 #    ⚠️ 本 skill 依赖同级 skills/lib/ 共享库（require('../lib/…')）——
-#    安装到 ~/.claude/skills/ 时必须整棵拷贝：AgentChat-OneWeb/ 与 lib/ 并排。
-#    只拷 AgentChat-OneWeb/ 会在启动时报出带修复指引的 FATAL（v14 起，不再是裸 MODULE_NOT_FOUND）。
+#    安装到 ~/.claude/skills/ 时必须整棵拷贝：agentchat-oneweb/ 与 lib/ 并排。
+#    只拷 agentchat-oneweb/ 会在启动时报出带修复指引的 FATAL（v14 起，不再是裸 MODULE_NOT_FOUND）。
 
 # 4. 至少一个 AI service 已登录 (Chrome profile 中)
 #    各 service 登录 URL:
@@ -323,29 +323,29 @@ curl -s http://127.0.0.1:9222/json/version | python3 -c "import json,sys; print(
 
 ```bash
 # 基本用法 — 自动遍历 fallback chain（默认保留浏览器标签）
-node ~/.claude/skills/AgentChat-OneWeb/index.js "Your prompt"
+node ~/.claude/skills/agentchat-oneweb/index.js "Your prompt"
 
 # 执行完毕后自动清理浏览器标签
-node ~/.claude/skills/AgentChat-OneWeb/index.js --close "Your prompt"
+node ~/.claude/skills/agentchat-oneweb/index.js --close "Your prompt"
 
 # 指定超时 (ms)
-node ~/.claude/skills/AgentChat-OneWeb/index.js --timeout=600000 "Long prompt..."
+node ~/.claude/skills/agentchat-oneweb/index.js --timeout=600000 "Long prompt..."
 
 # 从 stdin 读取
-echo "Prompt from pipe" | node ~/.claude/skills/AgentChat-OneWeb/index.js
+echo "Prompt from pipe" | node ~/.claude/skills/agentchat-oneweb/index.js
 
 # 环境检查 (不发送 prompt)
-node ~/.claude/skills/AgentChat-OneWeb/index.js --smoke
+node ~/.claude/skills/agentchat-oneweb/index.js --smoke
 
 # CDP 连通性检查
-node ~/.claude/skills/AgentChat-OneWeb/index.js --doctor
+node ~/.claude/skills/agentchat-oneweb/index.js --doctor
 
 # 强制指定起始 provider (跳过前面的)
-node ~/.claude/skills/AgentChat-OneWeb/index.js --from=ChatGPT "prompt"
+node ~/.claude/skills/agentchat-oneweb/index.js --from=ChatGPT "prompt"
 
 # 上传图片并提问（可重复 --image-path 上传多张）
-node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path=./photo.png "描述这张图片"
-node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path=a.png --image-path=b.jpg "比较这两张图片"
+node ~/.claude/skills/agentchat-oneweb/index.js --image-path=./photo.png "描述这张图片"
+node ~/.claude/skills/agentchat-oneweb/index.js --image-path=a.png --image-path=b.jpg "比较这两张图片"
 ```
 
 ### CLI Flags
@@ -355,7 +355,7 @@ node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path=a.png --image-path=
 | `--timeout=N` | 总超时 (ms)，包含所有 provider 尝试时间，默认 600000 |
 | `--timeout-per-provider=N` | 单个 provider 超时 (ms)，默认取 `timeout / 2` 或 180000 |
 | `--from=NAME` | 从指定 provider 开始，跳过链中前面的。NAME 可缩写不区分大小写 |
-| `--single` | 只尝试 `--from` 指定的那一个 provider，失败即返回，不级联到链中后续 provider。给需要自己做跨 provider 降级+加锁的调用方用（如 AgentChat-IndependentTasks），避免子进程内部级联绕开调用方的互斥锁 |
+| `--single` | 只尝试 `--from` 指定的那一个 provider，失败即返回，不级联到链中后续 provider。给需要自己做跨 provider 降级+加锁的调用方用（如 agentchat-independenttasks），避免子进程内部级联绕开调用方的互斥锁 |
 | `--only=NAME` | `--from=NAME --single` 的合并简写（程序化调用方使用；未知 NAME 会 fail loudly 而非静默回退） |
 | `--locale=xx_XX` | 强制 Gemini UI 语言 profile（`zh_CN` / `zh_TW` / `en` / `ja`），跳过自动检测。Python SDK 的 `locale=` 参数即透传此 flag |
 | `--smoke` | 环境检查：遍历所有 provider 确认至少一个可达 |
@@ -373,7 +373,7 @@ node ~/.claude/skills/AgentChat-OneWeb/index.js --image-path=a.png --image-path=
 
 - **stdout**: 成功时输出 AI 响应原文
 - **stderr**: 诊断日志，`[fallback]` 前缀
-- **telemetry**: 写入 `~/.claude/skills/AgentChat-OneWeb/data/fallback-telemetry.jsonl`
+- **telemetry**: 写入 `~/.claude/skills/agentchat-oneweb/data/fallback-telemetry.jsonl`
 
 ```json
 {

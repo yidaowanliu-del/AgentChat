@@ -1,5 +1,5 @@
 /**
- * lib/plan.js — shared plan-format handling for AgentChat-IndependentTasks.
+ * lib/plan.js — shared plan-format handling for agentchat-independenttasks.
  *
  * Extracted from index.js so both the orchestrator (index.js) and the linter
  * (validate_answers.js) consume the same expandSharedPlan logic — zero

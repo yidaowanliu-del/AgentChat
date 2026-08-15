@@ -1,0 +1,9 @@
+[project]
+name = "agentchat-daemon"
+version = "0.1.0"
+description = "Python deps for the AgentChat Chrome debug daemon (scripts/start-chrome-debug.py)"
+requires-python = ">=3.10"
+dependencies = [
+    "playwright>=1.40",
+    "websocket-client>=1.6",
+]

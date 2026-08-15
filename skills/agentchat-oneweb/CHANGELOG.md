@@ -1,4 +1,4 @@
-# AgentChat-OneWeb Changelog
+# agentchat-oneweb Changelog
 
 ## 2026-08-07 (v24) — 图片上传协议 (Image Upload Protocol)
 - **[P1] 图片上传管线 (`index.js` + `lib/providerFactory.js`)**: 新增 `--image-path=PATH` CLI flag，支持在发送 prompt 前将本地图片文件粘贴到 AI 聊天对话框。流程：读取图片→base64编码→async Clipboard API 写入剪贴板→Ctrl+V 粘贴→等待上传→输入 prompt 文本。支持 png/jpg/gif/webp/bmp/svg/tiff/avif/ico 格式，单文件 50MB 上限

@@ -85,7 +85,7 @@ async def ask_structured(
                 # That assumption is false: each session.ask() spawns a fresh
                 # OneWeb subprocess, and OneWeb's tab reuse does a
                 # page.goto(url) that STARTS A NEW CHAT (see findProviderPage's
-                # comment in AgentChat-OneWeb/index.js). The model receiving
+                # comment in agentchat-oneweb/index.js). The model receiving
                 # the retry had never seen the original prompt, the schema, or
                 # its "previous" reply — retries 2..N were guaranteed garbage.
                 # The correction must therefore be fully self-contained.

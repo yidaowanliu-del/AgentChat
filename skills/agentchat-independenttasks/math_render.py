@@ -3,7 +3,7 @@
 LaTeX → SVG math renderer for WeasyPrint PDF generation.
 
 Converts $...$ (inline) and $$...$$ (display) LaTeX math to SVG images
-embedded as base64 data URIs. Designed for use in the AgentChat-IndependentTasks
+embedded as base64 data URIs. Designed for use in the agentchat-independenttasks
 PDF pipeline where WeasyPrint cannot execute JavaScript (no MathJax/KaTeX).
 
 Dependencies: matplotlib (mathtext — no texlive required)

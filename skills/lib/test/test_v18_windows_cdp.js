@@ -38,7 +38,7 @@ function assert(cond, name) {
 // ── 1. CDP_URL wiring ───────────────────────────────────────────────────────
 console.log('[1] CDP_URL single source of truth (CDP_HOST regression)');
 {
-    const src = fs.readFileSync(path.join(AGENTCHAT_ROOT, 'skills', 'AgentChat-OneWeb', 'index.js'), 'utf8');
+    const src = fs.readFileSync(path.join(AGENTCHAT_ROOT, 'skills', 'agentchat-oneweb', 'index.js'), 'utf8');
     assert(!/CDP_URL\s*=\s*`http:\/\/127\.0\.0\.1/.test(src),
         'OneWeb no longer builds its own hardcoded 127.0.0.1 CDP_URL');
     assert(/CDP_URL:\s*LIB_CDP_URL/.test(src) && /const CDP_URL = LIB_CDP_URL/.test(src),

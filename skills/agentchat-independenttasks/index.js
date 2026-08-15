@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Parallel AI Decompose v3 — Thin Orchestrator over AgentChat-OneWeb
+ * Parallel AI Decompose v3 — Thin Orchestrator over agentchat-oneweb
  *
  * Core principles:
  *   1. DAG first, parallelism second (respect dependencies)
@@ -8,17 +8,17 @@
  *   3. Structured I/O with quality gates
  *   4. Evidence-based arbitration (not majority vote)
  *   5. Explicit degradation (never silent failure)
- *   6. Single provider source: AgentChat-OneWeb (no code duplication)
+ *   6. Single provider source: agentchat-oneweb (no code duplication)
  *
  * Three modules:
  *   M1: Task DAG — decompose task into complementary sub-prompts
  *   M2: Wave Dispatch — topological layers (depends_on honored); nodes within a
- *       wave run as parallel subprocesses → AgentChat-OneWeb, downstream
+ *       wave run as parallel subprocesses → agentchat-oneweb, downstream
  *       prompts receive upstream outputs ({{dep_id}} substitution or appendix)
  *   M3: Evidence Arbitrator — evidence-weighted synthesis + degradation report
  *
  * Provider subprocess plumbing lives in lib/execute.js (shared with
- * AgentChat-WebSubAgent); prompts travel over stdin, never argv.
+ * agentchat-websubagent); prompts travel over stdin, never argv.
  */
 
 const path = require("path");
@@ -28,7 +28,7 @@ const fs = require("fs");
 // GUARD: ../lib is a sibling tree shared by all AgentChat skills.
 // Copying ONLY this skill directory to ~/.claude/skills/ loses it —
 // every ../lib require would throw a bare MODULE_NOT_FOUND stack.
-// Mirror of the v14 guard in AgentChat-OneWeb/index.js.
+// Mirror of the v14 guard in agentchat-oneweb/index.js.
 // ═══════════════════════════════════════════════════════════════════
 let acquireLock, releaseLock, cleanupAllLocks, makeRunId, emitReceipt;
 try {
@@ -52,7 +52,7 @@ process.on("exit", cleanupAllLocks);
 process.on("SIGINT", () => { cleanupAllLocks(); process.exit(130); });
 process.on("SIGTERM", () => { cleanupAllLocks(); process.exit(143); });
 
-const WEBEXT = path.resolve(__dirname, "..", "AgentChat-OneWeb", "index.js");
+const WEBEXT = path.resolve(__dirname, "..", "agentchat-oneweb", "index.js");
 // Single source of truth: lib/providers/chain.js (shared with OneWeb).
 // Previously this required OneWeb's index.js just to read a constant,
 // dragging in playwright-core + all 8 adapter modules at orchestrator startup.
@@ -78,7 +78,7 @@ const log = (msg) => _log('orch', msg);
 // PROVIDER CALL — shared executor (lib/execute.js)
 // ═══════════════════════════════════════════════════════════════════
 // callProvider/runChain/cleanResponse previously lived here as a near-copy of
-// AgentChat-WebSubAgent's versions and had already drifted (exit-code labels,
+// agentchat-websubagent's versions and had already drifted (exit-code labels,
 // MIN_CALL_BUDGET). Now a single implementation, parameterized:
 //   holdLockOnSuccess: true — a successful provider stays locked so other
 //     workers IN THE SAME WAVE skip it (tab-collision protection). Locks are
@@ -1009,8 +1009,8 @@ async function main() {
 
   // Verify OneWeb exists
   if (!fs.existsSync(WEBEXT)) {
-    log(`FATAL: AgentChat-OneWeb not found at: ${WEBEXT}`);
-    log("  This skill depends on AgentChat-OneWeb for provider implementations.");
+    log(`FATAL: agentchat-oneweb not found at: ${WEBEXT}`);
+    log("  This skill depends on agentchat-oneweb for provider implementations.");
     process.exit(1);
   }
 
@@ -1089,7 +1089,7 @@ async function main() {
       }
       // append receipt
       rawLines.push(`\n[receipt] AGENTCHAT_RUN ${JSON.stringify({
-        run_id: RUN_ID, skill: "AgentChat-IndependentTasks",
+        run_id: RUN_ID, skill: "agentchat-independenttasks",
         timestamp: new Date().toISOString(), exit: exitCode,
         nodes: dag.nodes.length, failed: failCount,
         providers_used: Object.fromEntries(
@@ -1139,7 +1139,7 @@ async function main() {
   // by the agent's own answer.
   emitReceipt({
     skillDir: __dirname,
-    skill: 'AgentChat-IndependentTasks',
+    skill: 'agentchat-independenttasks',
     runId: RUN_ID,
     fields: {
       exit: exitCode,
@@ -1168,7 +1168,7 @@ async function main() {
 // file (e.g. from a test, or another script re-using FALLBACK_CHAIN/normalizeAI)
 // would immediately run the CLI: parse process.argv, block on stdin if no prompt
 // was given, spawn subprocesses, and eventually call process.exit(). Guarded to
-// match AgentChat-OneWeb/index.js's existing require.main === module pattern.
+// match agentchat-oneweb/index.js's existing require.main === module pattern.
 if (require.main === module) {
     main().catch(e => { log(`CRITICAL: ${e.message}`); process.exit(4); });
 }
