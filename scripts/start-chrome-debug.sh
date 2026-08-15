@@ -41,7 +41,7 @@ PROXY="${PROXY_SERVER:-http://127.0.0.1:7897}"
 HEADLESS="${HEADLESS:-false}"
 export CDP_PORT PROXY_SERVER PROXY HEADLESS
 LOG_FILE="${LOG_FILE:-/tmp/chrome-debug.log}"
-DAEMON_PID_FILE="$HOME/.local/state/agentchat/chrome-debug.pid"
+DAEMON_PID_FILE="${AGENTCHAT_STATE_DIR:-$HOME/.local/state/agentchat}/chrome-debug.pid"
 CHROME_PID_FILE="/tmp/chrome-debug.chrome.pid"
 DAEMON_SCRIPT="$SCRIPT_DIR/start-chrome-debug.py"
 
@@ -58,17 +58,21 @@ if [ -f "$DAEMON_PID_FILE" ]; then
     fi
 fi
 
-# ---- Ensure proxy is reachable ----
-PROXY_HOST=$(echo "$PROXY" | sed 's|http[s]*://||' | cut -d: -f1)
-PROXY_PORT=$(echo "$PROXY" | sed 's|.*:||')
-if ! curl -s --connect-timeout 2 "http://$PROXY_HOST:$PROXY_PORT" > /dev/null 2>&1; then
-    echo "[WARN] Proxy $PROXY not reachable. Attempting to start clash-verge..."
-    if command -v clash-verge &> /dev/null; then
-        nohup clash-verge &> /dev/null &
-        sleep 2
-    else
-        echo "[WARN] clash-verge not found. Please ensure your proxy is running."
+# ---- Ensure proxy is reachable (skip when PROXY_SERVER is empty/unset) ----
+if [ -n "${PROXY_SERVER:-}" ]; then
+    PROXY_HOST=$(echo "$PROXY" | sed 's|http[s]*://||' | cut -d: -f1)
+    PROXY_PORT=$(echo "$PROXY" | sed 's|.*:||')
+    if ! curl -s --connect-timeout 2 "http://$PROXY_HOST:$PROXY_PORT" > /dev/null 2>&1; then
+        echo "[WARN] Proxy $PROXY not reachable. Attempting to start clash-verge..."
+        if command -v clash-verge &> /dev/null; then
+            nohup clash-verge &> /dev/null &
+            sleep 2
+        else
+            echo "[WARN] clash-verge not found. Please ensure your proxy is running."
+        fi
     fi
+else
+    echo "[INFO] PROXY_SERVER not set — starting Chrome without proxy"
 fi
 
 # ---- Clean up stale Chrome browser (v3: precise PID, not pkill -9) ----
@@ -114,12 +118,20 @@ if [ ! -f "$DAEMON_SCRIPT" ]; then
     exit 1
 fi
 
-# Use flock to prevent two instances racing to start
+# Use flock to prevent two instances racing to start (skip if flock unavailable, e.g. macOS)
 exec 200>/tmp/chrome-debug.lock
-flock -n 200 || { echo "❌ Another chrome-debug launcher is running"; exit 1; }
+if command -v flock &> /dev/null; then
+    flock -n 200 || { echo "❌ Another chrome-debug launcher is running"; exit 1; }
+fi
 
 echo "[INFO] Launching Chrome daemon..."
-nohup python3 "$DAEMON_SCRIPT" > "$LOG_FILE" 2>&1 &
+# Prefer project venv (Python 3.10+ required for daemon script syntax)
+if [ -x "$PROJECT_DIR/.venv/bin/python" ]; then
+    PY="$PROJECT_DIR/.venv/bin/python"
+else
+    PY="python3"
+fi
+nohup "$PY" "$DAEMON_SCRIPT" > "$LOG_FILE" 2>&1 &
 DAEMON_PID=$!
 echo "[INFO] Daemon PID: $DAEMON_PID"
 

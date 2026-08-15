@@ -47,7 +47,8 @@ log = logging.getLogger("chrome-daemon")
 
 # ---- Config from env vars ----
 CDP_PORT = int(os.environ.get("CDP_PORT", "9222"))
-PROXY = os.environ.get("PROXY_SERVER", "http://127.0.0.1:7897")
+# PROXY_SERVER unset/empty → launch Chrome WITHOUT proxy (direct connection)
+PROXY = os.environ.get("PROXY_SERVER", "").strip() or None
 PROFILE = os.path.expanduser(os.environ.get("CHROME_PROFILE", "~/.chrome-debug-profile"))
 HEADLESS = os.environ.get("HEADLESS", "false").lower() in ("1", "true", "yes")
 CHROMIUM = os.environ.get("CHROMIUM_PATH")
@@ -55,8 +56,11 @@ CHROMIUM = os.environ.get("CHROMIUM_PATH")
 HEARTBEAT_INTERVAL = 15    # seconds between health checks (was 30)
 MAX_CRASH_RESTARTS = 5     # max consecutive auto-restarts before giving up
 
-# Secure state directory
-STATE_DIR = os.path.expanduser("~/.local/state/agentchat")
+# Secure state directory (AGENTCHAT_STATE_DIR overrides, e.g. if ~/.local/state
+# is owned by root and cannot be chowned without sudo)
+STATE_DIR = os.path.expanduser(
+    os.environ.get("AGENTCHAT_STATE_DIR", "~/.local/state/agentchat")
+)
 DAEMON_PID_FILE = os.path.join(STATE_DIR, "chrome-debug.pid")
 CHROME_PID_FILE = "/tmp/chrome-debug.chrome.pid"
 
@@ -134,12 +138,12 @@ def validate_profile(profile_dir: str, min_cookies_bytes: int = 50_000) -> str:
 
     cookies_size = os.path.getsize(cookies_path)
     if cookies_size < min_cookies_bytes:
-        log.error(f"Cookies file too small: {cookies_size} bytes (need ≥{min_cookies_bytes})")
-        log.error(f"  Path: {cookies_path}")
-        log.error("  This profile has NO login sessions (empty Cookies DB).")
-        log.error("  Fix CHROME_PROFILE in .env to point to the profile with your logins.")
-        log.error("  (Hint: ~/.chrome-debug-profile usually has the login state)")
-        sys.exit(1)
+        # Fresh profile is normal on first use — warn and continue so the user
+        # can log in to AI services in the freshly opened window.
+        log.warning(f"Cookies file small: {cookies_size} bytes (<{min_cookies_bytes})")
+        log.warning(f"  Path: {cookies_path}")
+        log.warning("  Fresh profile — log in to AI services in the Chrome window once;")
+        log.warning("  login state persists in CHROME_PROFILE across restarts.")
 
     log.info(f"Profile validated: {cookies_size}B Cookies at {cookies_path}")
     return profile_dir
@@ -256,14 +260,17 @@ def launch_browser(p):
     log.info("Launching in %s mode", "HEADLESS" if HEADLESS else "VISIBLE (GUI)")
 
     # launch_persistent_context preserves login state across restarts
-    context = p.chromium.launch_persistent_context(
+    # PROXY=None → direct connection (no proxy arg passed to Chrome)
+    launch_kwargs = dict(
         user_data_dir=PROFILE,
         headless=HEADLESS,
         executable_path=CHROMIUM,
-        proxy={"server": PROXY},
         args=args,
         viewport=None,
     )
+    if PROXY:
+        launch_kwargs["proxy"] = {"server": PROXY}
+    context = p.chromium.launch_persistent_context(**launch_kwargs)
 
     # === CORE FIX: register disconnect listener for immediate crash detection ===
     context.browser.on("disconnected", on_browser_disconnected)
