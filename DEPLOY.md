@@ -29,6 +29,7 @@ Python 依赖装进项目 venv（避免污染系统 Python；daemon 脚本要求
 
 ```bash
 uv sync                             # 按 uv.lock 精确复现（Python ≥3.10 自动解析）
+uv sync --group pdf                 # 可选：PDF 兜底管线（Typst 不可用时的 WeasyPrint+matplotlib）
 # 无 uv 时: python3 -m venv .venv && .venv/bin/pip install playwright websocket-client
 ```
 

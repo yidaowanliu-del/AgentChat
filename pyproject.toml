@@ -7,3 +7,12 @@ dependencies = [
     "playwright>=1.40",
     "websocket-client>=1.6",
 ]
+
+# 可选：agentchat-independenttasks 的 PDF 兜底管线（Typst 不可用时
+# WeasyPrint + math_render.py 渲染 LaTeX 公式）。默认 uv sync 不安装；
+# 需要时 uv sync --group pdf
+[dependency-groups]
+pdf = [
+    "matplotlib>=3.8",
+    "weasyprint>=61",
+]

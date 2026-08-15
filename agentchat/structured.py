@@ -26,7 +26,10 @@
 
 import json
 import re
-from typing import Type, TypeVar
+from typing import Type, TypeVar, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .session import GeminiSession
 
 T = TypeVar("T")
 
