@@ -271,6 +271,10 @@ const DIRECT_URL_RE = /https?:\/\/[^\s"'`<>]+\.(?:png|jpg|jpeg|gif|webp|svg)(?:\
 // was already complete — a provider failure manufactured out of a stuck JPEG.
 const MAX_IMAGES_PER_RESPONSE = 20;          // urls beyond this are skipped, loudly
 const MAX_IMAGE_BYTES = 30 * 1024 * 1024;    // per-image payload cap
+// Download target dir: AGENTCHAT_IMAGE_DIR overrides, else process.cwd()
+// (SKILL.md 下载协议：默认当前工作目录；固定目录需设环境变量，避免生成
+// 图片污染仓库根）。
+const IMAGE_DOWNLOAD_DIR = process.env.AGENTCHAT_IMAGE_DIR || process.cwd();
 const DOWNLOAD_PHASE_BUDGET_MS = 120_000;    // whole-phase deadline
 const IN_PAGE_FETCH_TIMEOUT_MS = 25_000;     // tier-2 fetch AbortSignal
 const EVALUATE_RACE_TIMEOUT_MS = 30_000;     // guard for a wedged CDP evaluate
@@ -1270,7 +1274,7 @@ async function main() {
             let finalResponse = result.response;
             if (downloadImages) {
                 try {
-                    const dlResult = await downloadAllImages(result.response, process.cwd(), { page: result.page }); // v13: session-aware download
+                    const dlResult = await downloadAllImages(result.response, IMAGE_DOWNLOAD_DIR, { page: result.page }); // v13: session-aware download
                     ctx.telemetry.images_ok = (dlResult.downloaded || []).length;
                     ctx.telemetry.images_failed = (dlResult.failed || []).length;
                     // v14: stdout is a MACHINE CONTRACT when piped (lib/execute.js,
