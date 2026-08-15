@@ -24,7 +24,9 @@ const PROFILES = {
         // 按钮文本校验 — Pro Extended 已激活的标志
         modelVerify:     /Pro\s*扩展/,
         // Pro 菜单项描述文本（区别于 Flash）
-        proDesc:         '高等数学',
+        // 2026-08: Google 改文案 "高等数学" → "高阶数学与代码"（实测 3.1 Pro）。
+        // 保留旧串兼容未更新的 UI。
+        proDesc:         '高阶数学',
         // 思考等级/程度 菜单项文本（v9 扁平菜单中不再使用，保留兼容旧 UI）
         thinking:        '思考等级',
         // Extended / 扩展思考 菜单项文本（v9 扁平菜单：直接点击）
@@ -93,7 +95,7 @@ const PROFILES = {
 const FUZZY = {
     modelAria:    /打开模式选择器|開啟模式挑選器|Model selector|モデルセレクターを開く/i,
     modelVerify:  /Pro\s*(扩展|延伸|延長|Extended|拡張)/i,
-    proDesc:      /進階|进阶|高等数学|Advanced|高度な数学/i,
+    proDesc:      /進階|进阶|高等数学|高阶数学|Advanced|高度な数学/i,
     thinking:     /思考等级|思考程度|Thinking|Thought|思考レベル/i,
     extended:     /扩展思考|延伸思考|Extended thinking|拡張思考|扩展|延長|Extended|拡張/i,
     standard:     /标准|標準|Standard|標準/i,
