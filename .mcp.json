@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "agentchat": {
+      "command": "/Users/aosom/.nvm/versions/node/v22.22.2/bin/node",
+      "args": [
+        "/Users/aosom/Documents/yhui/github/yidaowanliu-del/AgentChat/skills/mcp-server/index.mjs"
+      ]
+    }
+  }
+}
